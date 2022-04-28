@@ -29,11 +29,10 @@ const PizzaSchema = new Schema(
   { toJSON: { virtuals: true, getters: true }, id: false }
 );
 PizzaSchema.virtual("commentCount").get(function () {
-  return this.comments.reduce((total, comment) => {
-    console.log("total", total);
-    console.log("comment", comment.replies.length + 1);
-    return total + comment.replies.length + 1, 0;
-  });
+  return this.comments.reduce(
+    (total, comment) => total + comment.replies.length + 1,
+    0
+  );
 });
 const Pizza = model("Pizza", PizzaSchema);
 module.exports = Pizza;

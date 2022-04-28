@@ -143,28 +143,6 @@ async function handleNewCommentSubmit(event) {
     .catch((err) => {
       console.log(err);
     });
-
-  // console.log("fd", formData);
-  // try {
-  //   const response = await fetch(`/api/comments/${pizzaId}`, {
-  //     method: "POST",
-  //     headers: {
-  //       Accept: "application/json",
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(formData),
-  //   });
-
-  //   if (!response.ok) {
-  //     throw new Error({ code: 400 });
-  //   }
-
-  //   const commentResponse = await response.json();
-  //   console.log(commentResponse);
-  //   location.reload();
-  // } catch (error) {
-  //   console.log(error);
-  // }
 }
 
 function handleNewReplySubmit(event) {
@@ -184,6 +162,28 @@ function handleNewReplySubmit(event) {
   }
 
   const formData = { writtenBy, replyBody };
+
+  fetch(`/api/comments/${pizzaId}/${commentId}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Something went wrong!");
+      }
+      response.json();
+    })
+    .then((commentResponse) => {
+      console.log(commentResponse);
+      location.reload();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 $backBtn.addEventListener("click", function () {

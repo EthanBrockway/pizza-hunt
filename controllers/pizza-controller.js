@@ -52,7 +52,7 @@ const pizzaController = {
         res.json(dbPizzaData);
       })
       .catch((err) => {
-        console.log(object);
+        console.log(err);
         res.status(500).json(err);
       });
   },
@@ -67,7 +67,7 @@ const pizzaController = {
         res.json(dbPizzaData);
       })
       .catch((err) => {
-        console.log(object);
+        console.log(err);
         res.status(500).json(err);
       });
   },

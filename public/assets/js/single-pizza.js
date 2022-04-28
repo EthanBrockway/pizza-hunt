@@ -1,3 +1,5 @@
+// const res = require("express/lib/response");
+
 const $backBtn = document.querySelector("#back-btn");
 const $pizzaName = document.querySelector("#pizza-name");
 const $createdBy = document.querySelector("#created-by");
@@ -9,9 +11,28 @@ const $newCommentForm = document.querySelector("#new-comment-form");
 
 let pizzaId;
 
-function printPizza(pizzaData) {
-  console.log(pizzaData);
+function getPizza() {
+  const searchParams = new URLSearchParams(
+    document.location.search.substring(1)
+  );
+  const pizzaId = searchParams.get("id");
 
+  fetch(`/api/pizzas/${pizzaId}`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error({ message: "Something went wrong!" });
+      }
+      return response.json();
+    })
+    .then(printPizza)
+    .catch((err) => {
+      console.log(err);
+      alert("Cannot find a pizza with this id! Taking you back.");
+      window.history.back();
+    });
+}
+
+function printPizza(pizzaData) {
   pizzaId = pizzaData._id;
 
   const { pizzaName, createdBy, createdAt, size, toppings, comments } =
@@ -90,7 +111,7 @@ function printReply(reply) {
 `;
 }
 
-function handleNewCommentSubmit(event) {
+async function handleNewCommentSubmit(event) {
   event.preventDefault();
 
   const commentBody = $newCommentForm.querySelector("#comment").value;
@@ -101,6 +122,49 @@ function handleNewCommentSubmit(event) {
   }
 
   const formData = { commentBody, writtenBy };
+
+  fetch(`/api/comments/${pizzaId}`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Something went wrong!");
+      }
+      response.json();
+    })
+    .then((commentResponse) => {
+      location.reload();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  // console.log("fd", formData);
+  // try {
+  //   const response = await fetch(`/api/comments/${pizzaId}`, {
+  //     method: "POST",
+  //     headers: {
+  //       Accept: "application/json",
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(formData),
+  //   });
+
+  //   if (!response.ok) {
+  //     throw new Error({ code: 400 });
+  //   }
+
+  //   const commentResponse = await response.json();
+  //   console.log(commentResponse);
+  //   location.reload();
+  // } catch (error) {
+  //   console.log(error);
+  // }
 }
 
 function handleNewReplySubmit(event) {
@@ -128,3 +192,4 @@ $backBtn.addEventListener("click", function () {
 
 $newCommentForm.addEventListener("submit", handleNewCommentSubmit);
 $commentSection.addEventListener("submit", handleNewReplySubmit);
+getPizza();
